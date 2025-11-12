@@ -1,0 +1,1 @@
+# Dùng find contour và các dạng object detection để tìm và đưa ra ảnh contour của vật thể

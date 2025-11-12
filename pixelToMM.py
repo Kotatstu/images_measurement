@@ -1,0 +1,1 @@
+# Tính diện tính của vật thể dựa vào pixel và thước chuẩn
