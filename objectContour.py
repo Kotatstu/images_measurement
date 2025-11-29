@@ -9,10 +9,10 @@ def getFilledContourMask(gray_img):
     blurred = cv2.GaussianBlur(gray_img, (11, 11), 0)
 
     # 2. Nhị phân hóa
-    _, thres = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU) # THRESH_OTSU dùng để tự động chọn ngưỡng
+    _, thres = cv2.threshold(blurred, 70, 255, cv2.THRESH_BINARY_INV) # THRESH_OTSU dùng để tự động chọn ngưỡng (+ cv2.THRESH_OTSU)
 
     # 3. Morphology làm rõ vùng
-    kernel = np.ones((5, 5), dtype='uint8')
+    kernel = np.ones((3, 3), dtype='uint8')
     dilated = cv2.dilate(thres, kernel, iterations=3)
     processed = cv2.erode(dilated, kernel, iterations=2)
 

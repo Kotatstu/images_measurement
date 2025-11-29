@@ -14,7 +14,7 @@ from scaleCalibration import show_ruler_and_get_scale
 from objectContour import getFilledContourMask
 
 # Load và xử lý ảnh đầu vào
-ruler, obj, full = loadImage("./imgs/earphone.jpg")
+ruler, obj, full = loadImage("./imgs/wallet2.jpg")
 
 cv2.imshow("Anh vat the", obj)
 cv2.waitKey(0)
