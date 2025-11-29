@@ -8,6 +8,7 @@
 # Edge detection: Canny (cv2.Canny(blurred, 50, 150)), hoặc threshold (adaptive).
 
 import cv2
+import numpy as np
 
 # Hàm load ảnh theo grayscale, xử lý ảnh và trả về thước chuẩn + vật thể + full ảnh
 def loadImage(source):
@@ -22,6 +23,29 @@ def loadImage(source):
 
     return ruler, object, img
 
+# background estimation + illumination compensation code tham khảo trên stack overflow
+def removeObjectShadow(obj):
+    rgb_planes = cv2.split(obj)
+
+    result_planes = []
+    result_norm_planes = []
+    for plane in rgb_planes:
+        dilated_img = cv2.dilate(plane, np.ones((7,7), np.uint8))
+
+        bg_img = cv2.medianBlur(dilated_img, 21)
+
+        diff_img = 255 - cv2.absdiff(plane, bg_img)
+        # shadow = cv2.absdiff(plane, bg_img)
+        # diff_img = cv2.subtract(plane, shadow//2)
+
+        norm_img = cv2.normalize(diff_img,None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+        result_planes.append(diff_img)
+        result_norm_planes.append(norm_img)
+        
+    result = cv2.merge(result_planes)
+    result_norm = cv2.merge(result_norm_planes)
+
+    return result, result_norm
 
 
 # Test hàm
@@ -30,7 +54,10 @@ def loadImage(source):
 # cv2.imshow('Anh thuoc', ruler)
 # cv2.waitKey(0)
 
-# cv2.imshow('Anh thuoc', object)
+# cv2.imshow('Anh vat', object)
+# cv2.waitKey(0)
+# result, result_norm = removeObjectShadow(object)
+# cv2.imshow('Anh vat', result_norm)
 # cv2.waitKey(0)
 
 # cv2.destroyAllWindows()

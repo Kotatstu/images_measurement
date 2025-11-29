@@ -11,7 +11,23 @@ import numpy as np
 
 from imgLoad import loadImage
 from scaleCalibration import show_ruler_and_get_scale
+from objectContour import getFilledContourMask
 
+# Load và xử lý ảnh đầu vào
 ruler, obj, full = loadImage("./imgs/earphone.jpg")
 
-mmPerPixel = show_ruler_and_get_scale(ruler)
+cv2.imshow("Anh vat the", obj)
+cv2.waitKey(0)
+
+
+# Tính giá trị mm mỗi pixel
+#mmPerPixel = show_ruler_and_get_scale(ruler)
+
+
+# Tìm contour
+contourImg = getFilledContourMask(obj)
+contourImg = cv2.resize(contourImg, (500, 500))
+
+cv2.imshow("Contour", contourImg)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
