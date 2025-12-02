@@ -67,7 +67,7 @@ def show_ruler_and_get_scale(ruler_img):
 
     #print('Pixel length: ', pixel_dist)
 
-    real_mm = float(input("Nhập độ dài thật (mm): "))
+    real_mm = float(input("Nhap do dai that (mm): "))
     mm_per_pixel = compute_mm_per_pixel(pixel_dist, real_mm)
 
     print('mm_per_pixel =', mm_per_pixel)
