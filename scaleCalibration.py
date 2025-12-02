@@ -61,7 +61,7 @@ def compute_mm_per_pixel(pixel_dist, real_mm):
 def show_ruler_and_get_scale(ruler_img):
     pixel_dist = select_segment(ruler_img)
 
-    if pixel_dist == (None, None):
+    if pixel_dist == None:
         print('Cancelled')
         return None
 

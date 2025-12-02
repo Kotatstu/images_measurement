@@ -12,22 +12,34 @@ import numpy as np
 from imgLoad import loadImage
 from scaleCalibration import show_ruler_and_get_scale
 from objectContour import getFilledContourMask
+from pixelToMM import get_object_area
 
 # Load và xử lý ảnh đầu vào
-ruler, obj, full = loadImage("./imgs/wallet2.jpg")
+ruler, obj, full = loadImage("./imgs/earphone2.jpg")
+# print("Kich thuoc anh thuoc: ", ruler.size)
+# print("Kich thuoc anh vat the: ", obj.size)
+# print("Kich thuoc anh full", full.size)
 
 cv2.imshow("Anh vat the", obj)
 cv2.waitKey(0)
 
 
 # Tính giá trị mm mỗi pixel
-#mmPerPixel = show_ruler_and_get_scale(ruler)
+mmPerPixel = show_ruler_and_get_scale(ruler)
 
 
 # Tìm contour
-contourImg = getFilledContourMask(obj)
-contourImg = cv2.resize(contourImg, (500, 500))
+mask = getFilledContourMask(obj)
 
+
+# Tính diện tích vật thể
+objectArea = get_object_area(mask, mmPerPixel)
+print("Dien tich vat the:", objectArea, "mm2")
+
+
+contourImg = cv2.resize(mask, (500, 500))
 cv2.imshow("Contour", contourImg)
 cv2.waitKey(0)
+
+
 cv2.destroyAllWindows()
