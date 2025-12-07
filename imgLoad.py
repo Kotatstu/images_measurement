@@ -9,6 +9,7 @@
 
 import cv2
 import numpy as np
+from PIL import Image
 
 # Hàm load ảnh theo grayscale, xử lý ảnh và trả về thước chuẩn + vật thể + full ảnh
 def loadImage(source):
@@ -47,6 +48,47 @@ def removeObjectShadow(obj):
 
     return result, result_norm
 
+def load_image_gradio(img_pil):
+
+    if img_pil is None:
+        return None, None
+
+    img = np.array(img_pil)
+
+    # Convert sang gray bằng OpenCV
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+    # Resize chuẩn
+    gray = cv2.resize(gray, (500, 500))
+
+    # Tách ảnh
+    ruler = gray[0:100, :]
+    object = gray[100:500, :]
+
+    return ruler, object
+
+def load_image_gradio_ruler(img_pil):
+    
+    if img_pil is None:
+        return None, None
+
+    img = np.array(img_pil)
+
+    # Convert sang gray bằng OpenCV
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+    # Resize chuẩn
+    gray = cv2.resize(gray, (500, 500))
+
+    # Tách ảnh
+    ruler = gray[0:100, :]
+
+
+    # Convert ngược lại sang PIL để render trên giao diện
+    ruler_pil = Image.fromarray(ruler)
+
+
+    return ruler_pil
 
 # Test hàm
 # ruler, object, _ = loadImage('./imgs/earphone.jpg')

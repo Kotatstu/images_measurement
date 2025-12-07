@@ -2,10 +2,13 @@
 
 import cv2
 import numpy as np
+import math
+import gradio as gr
 
 from imgLoad import loadImage
 
 points = []
+click_points = []
 
 # Hàm đẩy các điểm click chuột vào list
 def mouse_callback(event, x, y, flags, param):
@@ -74,6 +77,37 @@ def show_ruler_and_get_scale(ruler_img):
 
     return mm_per_pixel
 
+# Các hàm dùng cho gradio
+def select_point(evt: gr.SelectData):
+    global click_points
+    x, y = evt.index
+    
+    if len(click_points) >= 2:
+        click_points = []  # reset nếu đã đủ 2 điểm
+        
+    click_points.append((x, y))
+    return f"Đã chọn điểm: {x}, {y}\nSố điểm hiện có: {len(click_points)}/2"
+
+# Hàm tính mm/pixel
+def calc_mm_per_pixel(real_mm):
+    if len(click_points) != 2:
+        return "Bạn phải chọn đúng 2 điểm!"
+    
+    (x1, y1), (x2, y2) = click_points
+    
+    pixel_dist = math.dist((x1, y1), (x2, y2))
+    mm_per_pixel = float(real_mm) / pixel_dist
+    
+    return f"Khoảng cách pixel = {pixel_dist:.2f} px\nmm/pixel = {mm_per_pixel:.5f}"
+
+# Vẫn là hàm tính mm/pixel nhưng mà trả về kiểu float để cho bước tính diện tích ở gradio
+def calc_mm_value(real_mm):
+    if len(click_points) != 2:
+        return None
+
+    (x1, y1), (x2, y2) = click_points
+    pixel_dist = math.dist((x1, y1), (x2, y2))
+    return float(real_mm) / pixel_dist
 
 # ruler, obj, full = loadImage("./imgs/earphone.jpg")
 
