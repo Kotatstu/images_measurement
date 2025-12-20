@@ -5,25 +5,35 @@ import numpy as np
 
 # Code gần như y hệt code contour thầy hướng dẫn
 def getFilledContourMask(gray_img):
-    # 1. Làm mờ giảm nhiễu
-    blurred = cv2.GaussianBlur(gray_img, (11, 11), 0)
+    # 1. Khử nhiễu nhưng giữ cạnh sắc nét (thay cho GaussianBlur)
+    # Bilateral Filter giúp tính diện tích chính xác hơn ở đường biên
+    blurred = cv2.bilateralFilter(gray_img, 9, 75, 75)
 
-    # 2. Nhị phân hóa
-    _, thres = cv2.threshold(blurred, 70, 255, cv2.THRESH_BINARY_INV) # THRESH_OTSU dùng để tự động chọn ngưỡng (+ cv2.THRESH_OTSU)
+    # 2. Nhị phân hóa tự động bằng phương pháp Otsu
+    # cv2.THRESH_OTSU tự động tìm ngưỡng tối ưu giữa vật thể và nền
+    _, thres = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-    # 3. Morphology làm rõ vùng
-    kernel = np.ones((3, 3), dtype='uint8')
-    dilated = cv2.dilate(thres, kernel, iterations=3)
-    processed = cv2.erode(dilated, kernel, iterations=2)
+    # 3. Bước DILATED (Giãn nở)
+    # Mục tiêu: Làm các phần bị khuyết hoặc đứt gãy trong vật thể dính liền lại
+    kernel = np.ones((5, 5), dtype='uint8')
+    dilated = cv2.dilate(thres, kernel, iterations=1)
 
-    # 4. Tìm contour
+    # 4. Bước PROCESS (Xử lý lọc nhiễu)
+    # Sử dụng phép Opening để xóa các đốm trắng nhỏ dư thừa phát sinh sau khi Dilate
+    processed = cv2.morphologyEx(dilated, cv2.MORPH_OPEN, kernel, iterations=1)
+
+    # 5. Tìm các contour
     contours, _ = cv2.findContours(processed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Tạo ảnh full đen
+    # Tạo ảnh đen để vẽ mask
     contourImg = np.zeros_like(gray_img)
 
-    # Fill toàn bộ đối tượng bằng màu trắng
-    cv2.drawContours(contourImg, contours, -1, (255, 255, 255), thickness=cv2.FILLED)
+    # 6. Chỉ chọn và vẽ vật thể lớn nhất
+    if contours:
+        # Tìm contour có diện tích lớn nhất (bỏ qua các vật thể rác)
+        largest_contour = max(contours, key=cv2.contourArea)
+        # Fill vật thể bằng màu trắng
+        cv2.drawContours(contourImg, [largest_contour], -1, (255, 255, 255), thickness=cv2.FILLED)
 
     return contourImg
 
@@ -36,3 +46,4 @@ def getFilledContourMask(gray_img):
 # cv2.imshow("Contour", contourImg)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
+
